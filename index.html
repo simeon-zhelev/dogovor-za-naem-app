@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="bg">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src &#39;self&#39;; script-src &#39;self&#39; &#39;wasm-unsafe-eval&#39;; style-src &#39;self&#39; &#39;unsafe-inline&#39;; img-src &#39;self&#39; blob: data:; font-src &#39;self&#39; data:; connect-src &#39;self&#39;; worker-src &#39;self&#39;; object-src &#39;none&#39;; base-uri &#39;none&#39;; form-action &#39;none&#39;">
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#1f5f4a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Договор" />
+    <link rel="manifest" href="/dogovor-za-naem-app/manifest.webmanifest" />
+    <link rel="icon" href="/dogovor-za-naem-app/icons/icon-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/dogovor-za-naem-app/icons/apple-touch-icon.png" />
+    <title>Договор за наем</title>
+    <script type="module" crossorigin src="/dogovor-za-naem-app/assets/index-DQC8MUja.js"></script>
+    <link rel="stylesheet" crossorigin href="/dogovor-za-naem-app/assets/index-DZv5fqpC.css">
+  </head>
+  <body>
+    <div id="app">
+      <header class="top">
+        <div class="top__row">
+          <h1>Договор за наем</h1>
+          <div class="row top__actions">
+            <button type="button" class="button button--small" id="update" hidden>Нова версия</button>
+            <button type="button" class="button button--ghost button--small" id="new-contract">Нов договор</button>
+          </div>
+        </div>
+        <p class="pill" id="models">Модели за разчитане: зареждане…</p>
+        <p class="notice" id="notice" role="status" hidden></p>
+      </header>
+
+      <nav class="steps" id="steps" aria-label="Стъпки">
+        <button type="button" data-go="property">1. Имот</button>
+        <button type="button" data-go="landlord">2. Наемодател</button>
+        <button type="button" data-go="tenants">3. Наематели</button>
+        <button type="button" data-go="terms">4. Условия</button>
+        <button type="button" data-go="protocol">5. Протокол</button>
+        <button type="button" data-go="review">6. PDF</button>
+      </nav>
+
+      <form id="contract-form" autocomplete="off">
+        <section class="card step" data-step="property">
+          <h2>Имот</h2>
+          <div class="field">
+            <label for="property-pick">Записан имот</label>
+            <select id="property-pick" class="select"></select>
+          </div>
+          <div class="field">
+            <label for="c-property">Адрес на имота</label>
+            <textarea id="c-property" name="property" rows="2" placeholder="гр. Варна, ул. Образцова № 10, ет. 4, ап. 8"></textarea>
+          </div>
+          <div class="grid">
+            <div class="field"><label for="c-city">Град на сключване</label><input id="c-city" name="city" /></div>
+            <div class="field"><label for="c-rent">Месечен наем, €</label><input id="c-rent" name="rent" inputmode="decimal" /></div>
+            <div class="field">
+              <label for="c-deposit">Депозит, €</label>
+              <input id="c-deposit" name="deposit" inputmode="decimal" placeholder="колкото наема" />
+            </div>
+          </div>
+          <div class="row">
+            <button type="button" class="button button--ghost" data-save="property">Запази имота</button>
+            <button type="button" class="link" data-delete="property" hidden>Изтрий от списъка</button>
+          </div>
+          <p class="note">
+            Записва адреса, града, наема, депозита, обзавеждането и ключовете само на този телефон, шифровано.
+          </p>
+          <p class="status" data-profile-status="property" aria-live="polite"></p>
+        </section>
+
+        <section class="card step" data-step="landlord" hidden>
+          <h2>Наемодател</h2>
+          <div class="field">
+            <label for="landlord-pick">Записан наемодател</label>
+            <select id="landlord-pick" class="select"></select>
+          </div>
+          <div class="fields" data-person="landlord"></div>
+          <div class="row">
+            <button type="button" class="button button--ghost" data-save="landlord">Запази наемодателя</button>
+            <button type="button" class="link" data-delete="landlord" hidden>Изтрий от списъка</button>
+          </div>
+          <p class="note">Записва се само на този телефон, шифровано, и се свързва с избрания имот.</p>
+          <p class="status" data-profile-status="landlord" aria-live="polite"></p>
+        </section>
+
+        <section class="card step" data-step="tenants" hidden>
+          <h2>Наематели</h2>
+          <p class="note">
+            Данните на наемателя не се записват никъде. Изтриват се след печат или след 15 минути без действие.
+          </p>
+          <div class="fields" data-person="tenant1"></div>
+          <label class="check"><input type="checkbox" name="twoTenants" /> Втори наемател</label>
+          <div id="tenant2-box" hidden>
+            <h3>Втори наемател</h3>
+            <div class="fields" data-person="tenant2"></div>
+          </div>
+        </section>
+
+        <section class="card step" data-step="terms" hidden>
+          <h2>Условия</h2>
+          <div class="grid">
+            <div class="field"><label for="c-date">Дата на договора</label><input id="c-date" name="date" type="date" /></div>
+            <div class="field"><label for="c-startDate">Наемът тече от</label><input id="c-startDate" name="startDate" type="date" /></div>
+            <div class="field">
+              <label for="c-months">Срок, месеци</label>
+              <input id="c-months" name="months" type="number" min="1" max="120" value="12" />
+            </div>
+            <div class="field">
+              <label for="c-payFrom">Плащане от число</label>
+              <input id="c-payFrom" name="payFrom" type="number" min="1" max="31" value="5" />
+            </div>
+            <div class="field">
+              <label for="c-payTo">до число</label>
+              <input id="c-payTo" name="payTo" type="number" min="1" max="31" value="10" />
+            </div>
+          </div>
+          <h3>Допълнителни споразумения</h3>
+          <div class="field">
+            <label for="c-extra">По едно на ред. Ако е празно, остават 5 реда за попълване на ръка.</label>
+            <textarea id="c-extra" name="extra" rows="3"></textarea>
+          </div>
+        </section>
+
+        <section class="card step" data-step="protocol" hidden>
+          <h2>Приемо-предавателен протокол</h2>
+          <label class="check"><input type="checkbox" name="protocol" checked /> Добави протокол след договора</label>
+          <div id="protocol-box" class="fields">
+            <div class="field">
+              <label for="c-inventory">Обзавеждане и оборудване, по едно на ред, напр. „Хладилник 1 бр.“</label>
+              <textarea id="c-inventory" name="inventory" rows="5"></textarea>
+            </div>
+            <div class="field"><label for="c-keys">Предадени ключове</label><input id="c-keys" name="keys" /></div>
+            <div class="row">
+              <button type="button" class="button button--ghost" data-save="inventory" hidden>Запази обзавеждането към имота</button>
+            </div>
+            <p class="status" data-profile-status="inventory" aria-live="polite"></p>
+            <h3>Показания на уредите</h3>
+            <p class="note">Празните остават за попълване на ръка.</p>
+            <div class="grid">
+              <div class="field"><label for="c-electricityDay">Електромер, дневна</label><input id="c-electricityDay" name="electricityDay" inputmode="decimal" /></div>
+              <div class="field"><label for="c-electricityNight">Електромер, нощна</label><input id="c-electricityNight" name="electricityNight" inputmode="decimal" /></div>
+              <div class="field"><label for="c-coldWater">Студена вода</label><input id="c-coldWater" name="coldWater" inputmode="decimal" /></div>
+              <div class="field"><label for="c-hotWater">Топла вода</label><input id="c-hotWater" name="hotWater" inputmode="decimal" /></div>
+              <div class="field"><label for="c-heating">Топломер / газ</label><input id="c-heating" name="heating" inputmode="decimal" /></div>
+            </div>
+            <div class="field"><label for="c-notes">Забележки</label><textarea id="c-notes" name="notes" rows="2"></textarea></div>
+          </div>
+        </section>
+      </form>
+
+      <section class="card step" data-step="review" hidden>
+        <h2>Преглед и PDF</h2>
+        <ul id="gaps" class="checks"></ul>
+
+        <details id="clauses-box">
+          <summary>Промени текста на член (само за този договор)</summary>
+          <p class="note">
+            Промяната важи само за този договор. Промененият член вече не се обновява от полетата.
+            Текстът между ** и ** излиза удебелен.
+          </p>
+          <div id="clauses" class="clauses"></div>
+        </details>
+
+        <div class="row">
+          <label class="check" for="copies">Екземпляри</label>
+          <select id="copies" class="select">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+          </select>
+        </div>
+        <div class="row">
+          <button type="button" class="button" id="pdf-build">Създай PDF</button>
+          <button type="button" class="button button--ghost" id="pdf-share" disabled>Сподели / печат</button>
+          <button type="button" class="button button--ghost" id="pdf-open" disabled>Отвори</button>
+        </div>
+        <p class="status" id="pdf-status" aria-live="polite"></p>
+
+        <div class="printed" id="printed" hidden>
+          <p><strong>Отпечата ли се договорът?</strong></p>
+          <p class="note">Ако да, данните на наемателя и PDF-ът се изтриват и започва нов договор.</p>
+          <div class="row">
+            <button type="button" class="button" id="printed-yes">Да, нов договор</button>
+            <button type="button" class="button button--ghost" id="printed-no">Не още</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="step-nav">
+        <button type="button" class="button button--ghost" id="step-prev">Назад</button>
+        <button type="button" class="button" id="step-next">Напред</button>
+      </div>
+    </div>
+
+    <div id="scan-view" class="scan-view" hidden>
+      <header class="scan-view__head">
+        <button type="button" class="button" id="scan-done">Готово</button>
+        <h1 id="scan-title">Лична карта</h1>
+      </header>
+
+      <section class="card" id="scan">
+        <p class="note">
+          Кадърът се обработва само в паметта на това устройство. Не се записва в галерията и не се изпраща никъде.
+        </p>
+        <div class="sides">
+          <div class="side" data-side="front">
+            <h3>Лице</h3>
+            <div class="thumb"></div>
+            <button type="button" class="button" data-scan="front">Снимай</button>
+            <label class="file">или избери снимка<input type="file" accept="image/*" data-file="front" /></label>
+            <p class="status" aria-live="polite"></p>
+          </div>
+          <div class="side" data-side="back">
+            <h3>Гръб</h3>
+            <div class="thumb"></div>
+            <button type="button" class="button" data-scan="back">Снимай</button>
+            <label class="file">или избери снимка<input type="file" accept="image/*" data-file="back" /></label>
+            <p class="status" aria-live="polite"></p>
+          </div>
+        </div>
+        <div class="row">
+          <button type="button" class="button button--ghost" id="demo">Тест с измислена карта</button>
+        </div>
+      </section>
+
+      <section class="card" id="result" hidden>
+        <h2>Сверяване с картата</h2>
+        <div id="fields" class="fields"></div>
+
+        <h3>Автоматични проверки</h3>
+        <ul id="checks" class="checks"></ul>
+
+        <h3>Как ще влезе в договора</h3>
+        <p id="preview" class="preview"></p>
+        <p class="status" id="assign-status" aria-live="polite"></p>
+
+        <details class="diagnostics">
+          <summary>Диагностика</summary>
+          <h3>Суров текст от разчитането</h3>
+          <pre id="raw"></pre>
+          <h3>Отчет без лични данни</h3>
+          <p class="note">
+            Съдържа кои полета са открити, колко време е отнело и подредбата на разчетения текст, в която всяка буква
+            и цифра е заменена (остават само надписите, отпечатани на всяка карта). Може да се копира и изпрати.
+          </p>
+          <textarea id="report" readonly rows="12"></textarea>
+          <div class="row">
+            <button type="button" class="button button--ghost" id="copy-report">Копирай отчета</button>
+          </div>
+        </details>
+      </section>
+    </div>
+
+  </body>
+</html>
